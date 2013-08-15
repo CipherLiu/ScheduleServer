@@ -83,4 +83,34 @@ default.jsp
     <servlet-name>EventCheck</servlet-name>
     <url-pattern>/EventCheck</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>OneDayEventQuery</display-name>
+    <servlet-name>OneDayEventQuery</servlet-name>
+    <servlet-class>com.schedule.OneDayEventQuery</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OneDayEventQuery</servlet-name>
+    <url-pattern>/OneDayEventQuery</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GroupCheck</display-name>
+    <servlet-name>GroupCheck</servlet-name>
+    <servlet-class>com.schedule.GroupCheck</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GroupCheck</servlet-name>
+    <url-pattern>/GroupCheck</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>SocialCheck</display-name>
+    <servlet-name>SocialCheck</servlet-name>
+    <servlet-class>com.schedule.SocialCheck</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SocialCheck</servlet-name>
+    <url-pattern>/SocialCheck</url-pattern>
+  </servlet-mapping>
 </web-app>

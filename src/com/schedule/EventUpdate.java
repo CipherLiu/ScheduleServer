@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -19,12 +20,14 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.bson.types.ObjectId;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
@@ -64,10 +67,12 @@ public class EventUpdate extends HttpServlet {
 		String calTo = request.getParameter("calTo");
 		String locationName = new String(
 				request.getParameter("locationName").getBytes("ISO-8859-1"),"UTF-8");
-		String locationCoordinate = request.getParameter("locationCoordinate");
+		String locationCoordinate = new String(
+				request.getParameter("locationCoordinate").getBytes("ISO-8859-1"),"UTF-8");
 		String decription = new String(
 				request.getParameter("decription").getBytes("ISO-8859-1"),"UTF-8"); 
 		String updateTime = request.getParameter("updateTime");
+		String targetGroup = request.getParameter("targetGroup");
 		try{
 			connection = new Mongo();
 			scheduleDB = connection.getDB("schedule");
@@ -89,9 +94,37 @@ public class EventUpdate extends HttpServlet {
 			event.put("record", "null");
 			event.put("commentCount", 0);
 			event.put("updateTime", updateTime);
-			
+			event.put("targetGroup", targetGroup);
+
 			writeResult = eventCollection.save(event);
-			if(writeResult.getN() != 0){
+			int N = writeResult.getN();
+			DBCollection groupCollection = scheduleDB.getCollection("group_"+userId);
+			DBObject groupQuery = new BasicDBObject();
+			groupQuery.put("_id", new ObjectId(targetGroup));
+			DBCursor cur = groupCollection.find(groupQuery);
+			while(cur.hasNext()){
+				JSONObject eventJSONObject= new JSONObject();
+				DBObject dbo = cur.next();
+				ArrayList<String> members= new ArrayList();
+				try{
+					members = (ArrayList<String>)dbo.get("member");	
+					for(int i = 0; i<members.size(); i++){	
+						DBCollection socialCollection = 
+							scheduleDB.getCollection("social_"+members.get(i));
+						DBObject socialEvent = new BasicDBObject();
+						socialEvent.put("eventId", event.get("_id").toString());
+						socialEvent.put("userId", userId);
+						socialEvent.put("updateTime", updateTime);
+						WriteResult wr2 = socialCollection.save(socialEvent);
+						if(wr2.getN() != 0 ){
+							jb.put("result", Primitive.DBSTOREERROR);
+						}
+					}
+				}catch(Exception e){
+					
+				}
+			}
+			if(N != 0 ){
 				jb.put("result", Primitive.DBSTOREERROR);
 			}else{
 				jb.put("result", Primitive.ACCEPT);
@@ -144,8 +177,12 @@ public class EventUpdate extends HttpServlet {
 						DBObject event = new BasicDBObject();
 						event.put("updateTime", updateTime);
 						event.put("eventName", eventName);
-						event.put("calFrom", calFrom);
-						event.put("calTo", calTo);
+						Date dateFrom = new Date();
+						Date dateTo = new Date();
+						dateFrom.setTime(Long.parseLong(calFrom));
+						dateTo.setTime(Long.parseLong(calTo));
+						event.put("calFrom", dateFrom);
+						event.put("calTo", dateTo);
 						event.put("locationName", locationName);
 						event.put("locationCoordinate", locationCoordinate);
 						event.put("decription", decription);
@@ -197,4 +234,5 @@ public class EventUpdate extends HttpServlet {
 		}
 	}
 
+	
 }

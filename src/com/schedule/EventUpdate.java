@@ -21,6 +21,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.bson.types.ObjectId;
+import org.json.JSONArray;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -157,9 +158,12 @@ public class EventUpdate extends HttpServlet {
 				scheduleDB = connection.getDB("schedule");
 				List items = upload.parseRequest(request);
 				Iterator iter = items.iterator();
+				ObjectId eventObjectId = new ObjectId();
+				String eventId = eventObjectId.toString();
 				while (iter.hasNext()) {
 					FileItem item = (FileItem) iter.next();
 					if (item.isFormField()) { 
+						
 						String paramValue = item.getString(); 
 						JSONObject param = JSON.parseObject(paramValue);
 						String userId = param.getString("userId");
@@ -172,33 +176,74 @@ public class EventUpdate extends HttpServlet {
 						String updateTime = param.getString("updateTime");
 						photo = param.getString("photo");
 						record = param.getString("record");
+						String targetGroup = param.getString("targetGroup");
 						eventCollection = scheduleDB.getCollection("event_"+userId);
 						WriteResult writeResult;
 						DBObject event = new BasicDBObject();
+						
 						event.put("updateTime", updateTime);
 						event.put("eventName", eventName);
 						Date dateFrom = new Date();
 						Date dateTo = new Date();
 						dateFrom.setTime(Long.parseLong(calFrom));
 						dateTo.setTime(Long.parseLong(calTo));
+						event.put("_id", eventObjectId);
 						event.put("calFrom", dateFrom);
 						event.put("calTo", dateTo);
 						event.put("locationName", locationName);
 						event.put("locationCoordinate", locationCoordinate);
 						event.put("decription", decription);
-						event.put("photo", photo.isEmpty() ? "null" : photo);
-						event.put("record", record.isEmpty() ? "null" : record);
+						event.put("photo", photo.isEmpty() ? "null" : 
+							photo.substring(0, photo.length() - 4)+eventId+".jpg");
+						event.put("record", record.isEmpty() ? "null" :
+							record.substring(0, record.length() - 4)+eventId+".amr");
 						event.put("commentCount", 0);
+						event.put("targetGroup", targetGroup);
 						writeResult = eventCollection.save(event);
 						if(writeResult.getN() != 0){
 							jb.put("result", Primitive.DBSTOREERROR);
 						}else{
-							jb.put("result", Primitive.ACCEPT);
+							
+							DBCollection groupCollection = scheduleDB.getCollection("group_"+userId);
+							DBObject groupQuery = new BasicDBObject();
+							groupQuery.put("_id", new ObjectId(targetGroup));
+							DBCursor cur = groupCollection.find(groupQuery);
+							while(cur.hasNext()){
+								DBObject dbo = cur.next();
+								//ArrayList<String> members= new ArrayList();
+								try{
+									String membersString = dbo.get("member").toString();
+									JSONArray members = new JSONArray(membersString);	
+									for(int i = 0; i<members.length(); i++){	
+										DBCollection socialCollection = 
+											scheduleDB.getCollection("social_"+members.get(i));
+										DBObject socialEvent = new BasicDBObject();
+										socialEvent.put("eventId", eventId);
+										socialEvent.put("userId", userId);
+										socialEvent.put("updateTime", updateTime);
+										WriteResult wr2 = socialCollection.save(socialEvent);
+										if(wr2.getN() != 0 ){
+											jb.put("result", Primitive.DBSTOREERROR);
+											
+										}else{
+											jb.put("result", Primitive.ACCEPT);
+											
+										}
+									}
+								}catch(NullPointerException npe){
+									jb.put("result", Primitive.ACCEPT);
+								}catch(Exception e){
+									jb.put("result", Primitive.DBSTOREERROR);
+									e.printStackTrace();
+								}
+							}
 						}
 							 
 					} else {
 						String fileName = item.getName();
+						
 						if(fileName.startsWith("EventImage")){
+							fileName = fileName.substring(0, fileName.length() - 4)+eventId+".jpg";
 							byte[] data = item.get();
 							InputStream inputStream = new ByteArrayInputStream(data);
 							GridFS fs = new GridFS(scheduleDB, "eventimg");
@@ -208,6 +253,7 @@ public class EventUpdate extends HttpServlet {
 							fsFile.save();
 							inputStream.close();	
 						}else if(fileName.startsWith("EventRecord")){
+							fileName = fileName.substring(0, fileName.length() - 4)+eventId+".amr";
 							byte[] data = item.get();
 							InputStream inputStream = new ByteArrayInputStream(data);
 							GridFS fs = new GridFS(scheduleDB, "eventrecord");
@@ -219,9 +265,10 @@ public class EventUpdate extends HttpServlet {
 						}
 						
 					}	
-				}  
+				}
+				System.out.println(jb.toString());	
 			} catch (FileUploadException e) {  
-				jb.put("request", Primitive.FILEPARSEERROR);
+				jb.put("result", Primitive.FILEPARSEERROR);
 				e.printStackTrace();  
 			}catch(MongoException e){
 			   	jb.put("result", Primitive.DBCONNECTIONERROR);
@@ -229,6 +276,7 @@ public class EventUpdate extends HttpServlet {
 			}
 			PrintWriter writer = response.getWriter();
 			writer.write(jb.toString());
+			System.out.println(jb.toString());
 			writer.flush();
 			writer.close();	
 		}

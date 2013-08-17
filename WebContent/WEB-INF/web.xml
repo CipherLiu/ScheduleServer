@@ -113,4 +113,44 @@ default.jsp
     <servlet-name>SocialCheck</servlet-name>
     <url-pattern>/SocialCheck</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>StrangerCheck</display-name>
+    <servlet-name>StrangerCheck</servlet-name>
+    <servlet-class>com.schedule.StrangerCheck</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>StrangerCheck</servlet-name>
+    <url-pattern>/StrangerCheck</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GroupUpdate</display-name>
+    <servlet-name>GroupUpdate</servlet-name>
+    <servlet-class>com.schedule.GroupUpdate</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GroupUpdate</servlet-name>
+    <url-pattern>/GroupUpdate</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>FriendsCheck</display-name>
+    <servlet-name>FriendsCheck</servlet-name>
+    <servlet-class>com.schedule.FriendsCheck</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FriendsCheck</servlet-name>
+    <url-pattern>/FriendsCheck</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GroupCreate</display-name>
+    <servlet-name>GroupCreate</servlet-name>
+    <servlet-class>com.schedule.GroupCreate</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GroupCreate</servlet-name>
+    <url-pattern>/GroupCreate</url-pattern>
+  </servlet-mapping>
 </web-app>

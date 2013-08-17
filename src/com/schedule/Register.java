@@ -17,6 +17,7 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.bson.types.ObjectId;
 
 //import org.apache.tomcat.util.http.fileupload.FileItem;
 
@@ -39,7 +40,8 @@ public class Register extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Mongo connection;
     private DB scheduleDB;
-    private DBCollection userCollection;   
+    private DBCollection userCollection; 
+    private String userId;
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -70,6 +72,7 @@ public class Register extends HttpServlet {
 				jb.put("result", Primitive.USERREGISTERED);
 			}else{
 				DBObject user = new BasicDBObject();
+				
 				user.put("email", email);
 				user.put("password", password);
 				user.put("username", username);
@@ -81,13 +84,13 @@ public class Register extends HttpServlet {
 				}else{
 					jb.put("result", Primitive.ACCEPT);
 					DBObject group = new BasicDBObject();
-					DBObject myself = new BasicDBObject();
-					group.put("groupName","default");
-					myself.put("groupName","myself");
+					//DBObject myself = new BasicDBObject();
+					group.put("groupName","All friends");
+					//myself.put("groupName","myself");
 					DBCollection groupCollection = 
 							scheduleDB.getCollection("group_" + user.get("_id"));
 					groupCollection.save(group);
-					groupCollection.save(myself);
+					//groupCollection.save(myself);
 				}
 			}
 		}catch(MongoException e){
@@ -116,6 +119,8 @@ public class Register extends HttpServlet {
 				scheduleDB = connection.getDB("schedule");
 				List items = upload.parseRequest(request);
 				Iterator iter = items.iterator();  
+				ObjectId userObjectId = new ObjectId();
+				String userId = userObjectId.toString();
 				while (iter.hasNext()) {  
 					FileItem item = (FileItem) iter.next();
 					if (item.isFormField()) {  
@@ -133,18 +138,31 @@ public class Register extends HttpServlet {
 							jb.put("result", Primitive.USERREGISTERED);
 						}else{
 							DBObject user = new BasicDBObject();
+							user.put("_id", userObjectId);
 							user.put("email", email);
 							user.put("password", password);
 							user.put("username", username);
-							user.put("image", image);
+							user.put("image", image.substring(
+									0, image.length() - 4)+userId+".jpg");
+							user.put("eventCount", 0);
+							user.put("groupCount", 1);
 							if(userCollection.save(user).getN() != 0){
 								jb.put("result", Primitive.DBSTOREERROR);
 							}else{
 								jb.put("result", Primitive.ACCEPT);
+								DBObject group = new BasicDBObject();
+								//DBObject myself = new BasicDBObject();
+								group.put("groupName","All friends");
+								//myself.put("groupName","myself");
+								DBCollection groupCollection = 
+										scheduleDB.getCollection("group_" + user.get("_id"));
+								groupCollection.save(group);
+								//groupCollection.save(myself);
 							}
 						}	 
 					} else {  
-						String fileName = item.getName();  
+						String fileName = item.getName(); 
+						fileName = fileName.substring(0, fileName.length() - 4)+userId+".jpg";
 						byte[] data = item.get();
 						InputStream inputStream = new ByteArrayInputStream(data);
 						GridFS fs = new GridFS(scheduleDB, "userimg");

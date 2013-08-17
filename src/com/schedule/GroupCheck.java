@@ -54,13 +54,13 @@ public class GroupCheck extends HttpServlet {
 			JSONArray ja = new JSONArray();
 			while(cur.hasNext()){
 				//ja.add(cur.next());
-				JSONObject eventJSONObject= new JSONObject();
+				JSONObject groupJSONObject= new JSONObject();
 				DBObject dbo = cur.next();
 				String id = dbo.get("_id").toString();
 				String groupName = (String)dbo.get("groupName");
-				eventJSONObject.put("_id", id);
-				eventJSONObject.put("groupName", groupName);
-				ja.add(eventJSONObject);
+				groupJSONObject.put("_id", id);
+				groupJSONObject.put("groupName", groupName);
+				ja.add(groupJSONObject);
 			}
 			jb.put("result", Primitive.ACCEPT);
 			jb.put("groupList",ja);

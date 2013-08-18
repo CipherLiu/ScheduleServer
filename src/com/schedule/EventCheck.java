@@ -2,7 +2,6 @@ package com.schedule;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -90,11 +89,6 @@ public class EventCheck extends HttpServlet {
 		writer.close();
 	}
 
-	private String calendarToString(Calendar calendar){
-		Date date = new Date(calendar.getTimeInMillis());
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-		return dateFormat.format(date);
-	}
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */

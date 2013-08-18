@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -266,7 +265,6 @@ public class EventUpdate extends HttpServlet {
 						
 					}	
 				}
-				System.out.println(jb.toString());	
 			} catch (FileUploadException e) {  
 				jb.put("result", Primitive.FILEPARSEERROR);
 				e.printStackTrace();  
@@ -276,7 +274,6 @@ public class EventUpdate extends HttpServlet {
 			}
 			PrintWriter writer = response.getWriter();
 			writer.write(jb.toString());
-			System.out.println(jb.toString());
 			writer.flush();
 			writer.close();	
 		}

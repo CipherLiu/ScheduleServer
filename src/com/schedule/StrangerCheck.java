@@ -2,15 +2,12 @@ package com.schedule;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Date;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.bson.types.ObjectId;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -21,7 +18,6 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
-import com.mongodb.WriteResult;
 
 /**
  * Servlet implementation class StrangerCheck
@@ -94,8 +90,10 @@ public class StrangerCheck extends HttpServlet {
 			jb.put("result", Primitive.DBCONNECTIONERROR);
 		   	e.printStackTrace();
 		}
+		response.setCharacterEncoding("UTF-8");
 		PrintWriter writer = response.getWriter();
-		writer.write(jb.toString());
+		String jbString = new String(jb.toString().getBytes(),"UTF-8");
+		writer.write(jbString);
 		writer.flush();
 		writer.close();
 	}

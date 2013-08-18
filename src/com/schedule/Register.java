@@ -41,7 +41,6 @@ public class Register extends HttpServlet {
 	private Mongo connection;
     private DB scheduleDB;
     private DBCollection userCollection; 
-    private String userId;
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -59,7 +58,7 @@ public class Register extends HttpServlet {
 		JSONObject jb = new JSONObject();
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
-		String username = new String(request.getParameter("username").getBytes("ISO-8859-1"),"UTF-8"); 
+		String username = new String(request.getParameter("username").getBytes("ISO-8859-1"),"UTF-8");
 		try{
 			connection = new Mongo();
 			scheduleDB = connection.getDB("schedule");

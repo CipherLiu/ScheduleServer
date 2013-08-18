@@ -45,26 +45,6 @@ default.jsp
   </servlet-mapping>
   <servlet>
     <description></description>
-    <display-name>UserImgUpdate</display-name>
-    <servlet-name>UserImgUpdate</servlet-name>
-    <servlet-class>com.schedule.UserImgUpdate</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>UserImgUpdate</servlet-name>
-    <url-pattern>/UserImgUpdate</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>Init</display-name>
-    <servlet-name>Init</servlet-name>
-    <servlet-class>com.schedule.Init</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>Init</servlet-name>
-    <url-pattern>/Init</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
     <display-name>EventUpdate</display-name>
     <servlet-name>EventUpdate</servlet-name>
     <servlet-class>com.schedule.EventUpdate</servlet-class>
@@ -152,5 +132,15 @@ default.jsp
   <servlet-mapping>
     <servlet-name>GroupCreate</servlet-name>
     <url-pattern>/GroupCreate</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GroupSocial</display-name>
+    <servlet-name>GroupSocial</servlet-name>
+    <servlet-class>com.schedule.GroupSocial</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GroupSocial</servlet-name>
+    <url-pattern>/GroupSocial</url-pattern>
   </servlet-mapping>
 </web-app>

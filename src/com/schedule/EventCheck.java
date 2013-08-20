@@ -1,3 +1,8 @@
+/*
+ *Check the days in a month view whether they have events
+ * 
+ **/
+
 package com.schedule;
 
 import java.io.IOException;

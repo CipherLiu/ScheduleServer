@@ -1,8 +1,6 @@
 /*
- *Add new members to the default group "All friends"
- * 
- **/
-
+ * add members to the group located by groupId
+ * */
 package com.schedule;
 
 import java.io.IOException;
@@ -14,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,30 +20,25 @@ import org.json.JSONObject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
+import com.mongodb.WriteResult;
 
 /**
- * Servlet implementation class GroupUpdate
+ * Servlet implementation class MemberAdd
  */
-public class GroupUpdate extends HttpServlet {
+public class MemberAdd extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GroupUpdate() {
+    public MemberAdd() {
         super();
         // TODO Auto-generated constructor stub
     }
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
@@ -65,29 +59,38 @@ public class GroupUpdate extends HttpServlet {
 			JSONObject receivedObject = new JSONObject(receivedString);
 			String userId = receivedObject.getString("userId");
 			JSONArray friends = receivedObject.getJSONArray("friends");
+			String groupId = receivedObject.getString("groupId");
 			try{
 				Mongo mongo =new Mongo();
 				DB scheduleDB = mongo.getDB("schedule");
 				DBCollection groupCollection = scheduleDB.getCollection("group_"+userId);
-				for(int i = 0; i < friends.length(); i++){
-					DBObject ifExist = new BasicDBObject();
-					ifExist.put("groupName", "All friends");
-					ifExist.put("member", friends.getString(i));
-					if(!groupCollection.find(ifExist).hasNext()){
-						DBObject friend = new BasicDBObject();
-						friend.put("member", friends.getString(i));
+				int i;
+				for(i =0; i < friends.length(); i++){				
+					DBObject memberCheckQuery = new BasicDBObject();
+					memberCheckQuery.put("member", friends.getString(i));
+					memberCheckQuery.put("_id", new ObjectId(groupId));
+					DBCursor mcqCur = groupCollection.find(memberCheckQuery);
+					if(!mcqCur.hasNext()){
+						DBObject updateObject = new BasicDBObject();
 						DBObject member = new BasicDBObject();
-						member.put("$push", friend);
-						DBObject query = new BasicDBObject();
-						query.put("groupName", "All friends");
-						groupCollection.update(query,member);
-					}			
+						member.put("member", friends.getString(i));
+						updateObject.put("$push", member);
+						DBObject updateQuery = new BasicDBObject();
+						updateQuery.put("_id", new ObjectId(groupId));WriteResult wr2 =groupCollection.update(
+								updateQuery, updateObject);
+						if(wr2.getN() == 0){
+							jb.put("result", Primitive.DBSTOREERROR);
+							break;
+						}
+					}
+				}
+				if( i == friends.length()){
+					jb.put("result", Primitive.ACCEPT);
 				}
 			}catch(MongoException e){
 				jb.put("result", Primitive.DBCONNECTIONERROR);
 				e.printStackTrace();
 			}
-			jb.put("result", Primitive.ACCEPT);
 		} 
 		catch (JSONException e) {
 			// TODO Auto-generated catch block

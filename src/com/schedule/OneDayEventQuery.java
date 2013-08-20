@@ -1,3 +1,8 @@
+/*
+ *Check user's event in one day 
+ * 
+ **/
+
 package com.schedule;
 
 import java.io.IOException;
@@ -9,6 +14,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.bson.types.ObjectId;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -85,6 +92,14 @@ public class OneDayEventQuery extends HttpServlet {
 				String photo = (String)dbo.get("photo");
 				String record = (String)dbo.get("record");
 				int commentCount = (Integer)dbo.get("commentCount");
+				String commentsString;
+				try{
+					commentsString = dbo.get("comments").toString();
+					eventJSONObject.put("commentsString", commentsString);
+				}catch(NullPointerException npe){
+					JSONArray nullArray = new JSONArray();
+					eventJSONObject.put("commentsString", nullArray.toString());
+				}
 				String updateTime = (String)dbo.get("updateTime");
 				eventJSONObject.put("_id", id);
 				eventJSONObject.put("eventName", eventName);
@@ -97,6 +112,16 @@ public class OneDayEventQuery extends HttpServlet {
 				eventJSONObject.put("record", record);
 				eventJSONObject.put("commentCount", commentCount);
 				eventJSONObject.put("updateTime", updateTime);
+				eventJSONObject.put("publisherId",userId);
+				DBCollection userCollection = scheduleDB.getCollection("user");
+				DBObject imageQuery = new BasicDBObject();
+				imageQuery.put("_id", new ObjectId(userId));
+				DBCursor cur3 = userCollection.find(imageQuery);
+				DBObject dbo3 = cur3.next();
+				String image = (String)dbo3.get("image");
+				String publisherName = (String)dbo3.get("username");
+				eventJSONObject.put("publisherImage",image);
+				eventJSONObject.put("publisherName",publisherName);
 				ja.add(eventJSONObject);
 			}
 			jb.put("result", Primitive.ACCEPT);

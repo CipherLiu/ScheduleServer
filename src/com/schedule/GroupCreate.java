@@ -1,3 +1,8 @@
+/*
+ *Create a new group
+ * 
+ **/
+
 package com.schedule;
 
 import java.io.IOException;
@@ -78,7 +83,6 @@ public class GroupCreate extends HttpServlet {
 						DBObject updateObject = new BasicDBObject();
 						DBObject member = new BasicDBObject();
 						member.put("member", friends.getString(i));
-						System.out.println(friends.getString(i));
 						updateObject.put("$push", member);
 						DBObject updateQuery = new BasicDBObject();
 						String groupId = groupDBObject.get("_id").toString();

@@ -1,3 +1,8 @@
+/*
+ *Check friends' social events in one day 
+ * 
+ **/
+
 package com.schedule;
 
 import java.io.IOException;
@@ -59,7 +64,7 @@ public class SocialCheck extends HttpServlet {
 			DBCursor cur = socialCollection.find().sort(orderBy);
 			JSONArray ja = new JSONArray();
 			int i = 0;
-			while(cur.hasNext() && i < 10){
+			while(cur.hasNext() && i < 20){
 				//ja.add(cur.next());
 				JSONObject eventJSONObject= new JSONObject();
 				DBObject dbo = cur.next();
@@ -71,7 +76,6 @@ public class SocialCheck extends HttpServlet {
 				eventQuery.put("_id", new ObjectId(publishedEventId));
 				DBCursor cur2 = publisherEventCollection.find(eventQuery);
 				DBObject dbo2 = cur2.next();
-				String id = dbo.get("_id").toString();
 				String eventName = (String)dbo2.get("eventName");
 				Date calFrom = (Date)dbo2.get("calFrom");
 				Date calTo = (Date)dbo2.get("calTo");
@@ -82,7 +86,15 @@ public class SocialCheck extends HttpServlet {
 				String record = (String)dbo2.get("record");
 				int commentCount = (Integer)dbo2.get("commentCount");
 				String updateTime = (String)dbo2.get("updateTime");
-				eventJSONObject.put("_id", id);
+				String commentsString;
+				try{
+					commentsString = dbo2.get("comments").toString();
+					eventJSONObject.put("commentsString", commentsString);
+				}catch(NullPointerException npe){
+					JSONArray nullArray = new JSONArray();
+					eventJSONObject.put("commentsString", nullArray.toString());
+				}
+				eventJSONObject.put("_id", publishedEventId);
 				eventJSONObject.put("eventName", eventName);
 				eventJSONObject.put("calFrom", calFrom.getTime());
 				eventJSONObject.put("calTo", calTo.getTime());
@@ -101,15 +113,21 @@ public class SocialCheck extends HttpServlet {
 				if(cur3.hasNext()){
 					DBObject dbo3 = cur3.next();
 					String image = (String)dbo3.get("image");
+					String publisherName = (String)dbo3.get("username");
 					eventJSONObject.put("publisherImage",image);
+					eventJSONObject.put("publisherName",publisherName);
 				}else{
-					eventJSONObject.put("publisherImage","null");
+					
+					break;
 				}
 				ja.add(eventJSONObject);
 				i++;
+			}if(cur.hasNext() && i < 20){
+				jb.put("result", Primitive.DBSTOREERROR);
+			}else{
+				jb.put("result", Primitive.ACCEPT);
+				jb.put("socialEventArray", ja);
 			}
-			jb.put("result", Primitive.ACCEPT);
-			jb.put("socialEventArray", ja);
 			
 		}catch(MongoException e){
 			jb.put("result", Primitive.DBCONNECTIONERROR);

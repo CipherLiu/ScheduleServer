@@ -1,3 +1,8 @@
+/*
+ *Check the members in the default group "All friends"
+ * 
+ **/
+
 package com.schedule;
 
 import java.io.IOException;
@@ -92,8 +97,11 @@ public class FriendsCheck extends HttpServlet {
 			}
 		   	e.printStackTrace();
 		}
+		
+		response.setCharacterEncoding("UTF-8");
 		PrintWriter writer = response.getWriter();
-		writer.write(jb.toString());
+		String jbString = new String(jb.toString().getBytes(),"UTF-8");
+		writer.write(jbString);
 		writer.flush();
 		writer.close();
 	}

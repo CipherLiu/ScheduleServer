@@ -1,3 +1,8 @@
+/*
+ *Add a new event 
+ * 
+ **/
+
 package com.schedule;
 
 import java.io.ByteArrayInputStream;

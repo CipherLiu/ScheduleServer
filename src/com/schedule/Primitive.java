@@ -1,3 +1,7 @@
+/*
+ *communication primitives
+ * 
+ **/
 package com.schedule;
 
 public class Primitive {

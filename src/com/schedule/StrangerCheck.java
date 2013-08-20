@@ -1,3 +1,8 @@
+/*
+ *Check the strangers that can be added as friends
+ * 
+ **/
+
 package com.schedule;
 
 import java.io.IOException;
@@ -62,7 +67,7 @@ public class StrangerCheck extends HttpServlet {
 			JSONArray strangersArray = new JSONArray();
 			int i = 0;
 
-			while(cur.hasNext() && i <10){
+			while(cur.hasNext() && i <20){
 				DBObject stranger = cur.next();
 				String strangerId= stranger.get("_id").toString();
 

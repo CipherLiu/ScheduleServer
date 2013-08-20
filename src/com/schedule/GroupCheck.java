@@ -1,3 +1,8 @@
+/*
+ *Check the groups' info  
+ * 
+ **/
+
 package com.schedule;
 
 import java.io.IOException;

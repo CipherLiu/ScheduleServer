@@ -143,4 +143,34 @@ default.jsp
     <servlet-name>GroupSocial</servlet-name>
     <url-pattern>/GroupSocial</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>MemberAddCheck</display-name>
+    <servlet-name>MemberAddCheck</servlet-name>
+    <servlet-class>com.schedule.MemberAddCheck</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MemberAddCheck</servlet-name>
+    <url-pattern>/MemberAddCheck</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>MemberAdd</display-name>
+    <servlet-name>MemberAdd</servlet-name>
+    <servlet-class>com.schedule.MemberAdd</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MemberAdd</servlet-name>
+    <url-pattern>/MemberAdd</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>CommentUpdate</display-name>
+    <servlet-name>CommentUpdate</servlet-name>
+    <servlet-class>com.schedule.CommentUpdate</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CommentUpdate</servlet-name>
+    <url-pattern>/CommentUpdate</url-pattern>
+  </servlet-mapping>
 </web-app>

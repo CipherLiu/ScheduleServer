@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
@@ -75,12 +76,29 @@ public class GroupUpdate extends HttpServlet {
 					ifExist.put("member", friends.getString(i));
 					if(!groupCollection.find(ifExist).hasNext()){
 						DBObject friend = new BasicDBObject();
-						friend.put("member", friends.getString(i));
+						String memberId = friends.getString(i);
+						friend.put("member", memberId);
 						DBObject member = new BasicDBObject();
 						member.put("$push", friend);
 						DBObject query = new BasicDBObject();
 						query.put("groupName", "All friends");
 						groupCollection.update(query,member);
+						DBCollection eventCollection = scheduleDB.getCollection("event_"+userId);
+						DBCursor eventCur = eventCollection.find();
+						int count = 0;
+						while(eventCur.hasNext() && count <10){
+							DBObject eventObject = eventCur.next();
+							String eventId = eventObject.get("_id").toString();
+							String updateTime = eventObject.get("updateTime").toString();
+							DBObject socialObject = new BasicDBObject();
+							socialObject.put("userId", userId);
+							socialObject.put("eventId", eventId);
+							socialObject.put("updateTime", updateTime);
+							DBCollection socialCollection = 
+									scheduleDB.getCollection("social_"+memberId);
+							socialCollection.save(socialObject);
+						}
+						
 					}			
 				}
 			}catch(MongoException e){

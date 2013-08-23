@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
@@ -82,7 +83,8 @@ public class GroupCreate extends HttpServlet {
 					for(i =0; i < friends.length(); i++){
 						DBObject updateObject = new BasicDBObject();
 						DBObject member = new BasicDBObject();
-						member.put("member", friends.getString(i));
+						String memberId = friends.getString(i);
+						member.put("member", memberId);
 						updateObject.put("$push", member);
 						DBObject updateQuery = new BasicDBObject();
 						String groupId = groupDBObject.get("_id").toString();

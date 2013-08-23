@@ -55,8 +55,8 @@ public class MemberAddCheck extends HttpServlet {
 		DBCursor defGroupCur = groupCollection.find(groupQuery);
 		if(defGroupCur.hasNext()){
 			DBObject tarGroupDBObject = defGroupCur.next();
-			String defGroupMemberString = tarGroupDBObject.get("member").toString();
 			try {
+				String defGroupMemberString = tarGroupDBObject.get("member").toString();
 				JSONArray defGroupMemberArray = new JSONArray(defGroupMemberString);
 				JSONArray memberExcludeArray = new JSONArray();
 				for(int i = 0; i < defGroupMemberArray.length(); i++){
@@ -87,11 +87,8 @@ public class MemberAddCheck extends HttpServlet {
 				}
 				jb.put("result", Primitive.ACCEPT);
 				jb.put("memberExcludeArray", memberExcludeArray);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}catch(NullPointerException npe){
-				npe.printStackTrace();
+			} catch(NullPointerException npe){
+				
 				JSONArray memberExcludeArray = new JSONArray();
 				try {
 					jb.put("result", Primitive.ACCEPT);
@@ -100,7 +97,9 @@ public class MemberAddCheck extends HttpServlet {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+			}catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}else{
 			try {

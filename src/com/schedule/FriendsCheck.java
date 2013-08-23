@@ -83,7 +83,16 @@ public class FriendsCheck extends HttpServlet {
 					}
 					jb.put("friendsArray", friendsArray);
 					jb.put("result", Primitive.ACCEPT);
-				} catch (JSONException e) {
+				}catch(NullPointerException npe){
+					JSONArray emptyFriendsArray = new JSONArray();
+					try {
+						jb.put("friendsArray", emptyFriendsArray);
+						jb.put("result", Primitive.ACCEPT);
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
